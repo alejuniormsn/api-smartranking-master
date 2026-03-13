@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: smartranking_container
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: smartranking
+      POSTGRES_PASSWORD: smart2026
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
