@@ -78,7 +78,7 @@ export class UserService {
 
   async create(
     userDto: CreateUserDto,
-    @CustomParamToken() tokenPayload: PayloadTokenDto
+    tokenPayload: PayloadTokenDto
   ): Promise<IUser> {
     if (tokenPayload.role !== "admin") {
       throw new UnauthorizedException(
@@ -104,7 +104,7 @@ export class UserService {
   async update(
     id: number,
     updateUserDto: UpdateUserDto,
-    @CustomParamToken() tokenPayload: PayloadTokenDto
+    tokenPayload: PayloadTokenDto
   ): Promise<IUser> {
     if (tokenPayload.role !== "admin") {
       throw new UnauthorizedException(
@@ -144,10 +144,7 @@ export class UserService {
     }
   }
 
-  async remove(
-    id: number,
-    @CustomParamToken() tokenPayload: PayloadTokenDto
-  ): Promise<object> {
+  async remove(id: number, tokenPayload: PayloadTokenDto): Promise<object> {
     if (tokenPayload.role !== "admin") {
       throw new UnauthorizedException(
         "Permission denied. You can only delete users as admin!"
