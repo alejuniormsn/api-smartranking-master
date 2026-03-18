@@ -12,7 +12,6 @@ import { UpdateUserDto } from "./dtos/update-user.dto";
 import { HashingService } from "src/auth/hash/hashing.service";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { PayloadTokenDto } from "src/auth/dto/payload-token.dto";
-import { CustomParamToken } from "src/auth/decorator/custom-param-token";
 import { handleDatabaseError } from "src/common/error/handleDatabaseError";
 
 @Injectable()
@@ -54,10 +53,7 @@ export class UserService {
     }
   }
 
-  async findOne(
-    id: number,
-    @CustomParamToken() tokenPayload: PayloadTokenDto
-  ): Promise<IUser> {
+  async findOne(id: number, tokenPayload: PayloadTokenDto): Promise<IUser> {
     try {
       const user = await this.userRepository.findByPk(id, {
         attributes: { exclude: ["password"] },
