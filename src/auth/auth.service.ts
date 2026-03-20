@@ -59,8 +59,14 @@ export class AuthService {
       };
 
       return { user, token };
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "AuthService.authenticate",
+        signInDto: JSON.stringify({
+          email: signInDto.email,
+          password: this.hashingService.hash(signInDto.password),
+        }),
+      });
     }
   }
 }

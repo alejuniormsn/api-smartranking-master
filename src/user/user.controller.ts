@@ -51,6 +51,7 @@ export class UserController {
   ): Promise<IUser> {
     return this.userService.findOne(id, tokenPayload);
   }
+
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,

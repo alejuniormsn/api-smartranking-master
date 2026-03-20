@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common/exceptions";
+import { Logger } from "@nestjs/common";
 
 interface ExtendedError extends Error {
   parent?: string;
@@ -15,16 +16,25 @@ export interface CustomError {
   response?: any;
 }
 
-export const handleDatabaseError = (
-  error: unknown
-):
-  | BadRequestException
-  | InternalServerErrorException
-  | NotFoundException
-  | UnauthorizedException => {
-  if (error instanceof NotFoundException) return error;
+const logger = new Logger("DatabaseErrorHandler");
 
-  if (error instanceof UnauthorizedException) return error;
+export const handleDatabaseError = (
+  error: unknown,
+  metadata?: Record<string, any>
+) => {
+  const err = error as ExtendedError;
+
+  logger.error(
+    `Exception: ${err?.name}. Message: ${err?.parent}. Metadata: ${JSON.stringify(metadata)}`,
+    error instanceof Error ? error.stack : "No stack trace"
+  );
+
+  if (
+    error instanceof NotFoundException ||
+    error instanceof UnauthorizedException
+  ) {
+    return error;
+  }
 
   if (error === null || error === undefined) {
     return new InternalServerErrorException("Internal Server Error");
@@ -35,7 +45,6 @@ export const handleDatabaseError = (
   }
 
   if (error instanceof Error) {
-    const err = error as ExtendedError;
     switch (err.name) {
       case "SequelizeConnectionRefusedError":
       case "SequelizeConnectionError":

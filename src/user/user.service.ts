@@ -18,7 +18,7 @@ import { handleDatabaseError } from "src/common/error/handleDatabaseError";
 export class UserService {
   constructor(
     @Inject("USER_REPOSITORY")
-    private userRepository: typeof UserEntity,
+    private readonly userRepository: typeof UserEntity,
     private readonly hashingService: HashingService
   ) {}
 
@@ -31,8 +31,10 @@ export class UserService {
         throw new NotFoundException(`Not found "users"`);
       }
       return users;
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.findAll",
+      });
     }
   }
 
@@ -48,8 +50,11 @@ export class UserService {
         throw new NotFoundException(`Not found "users"`);
       }
       return users;
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.findAllV3",
+        paginationDto,
+      });
     }
   }
 
@@ -67,8 +72,12 @@ export class UserService {
         );
       }
       return user;
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.findOne",
+        requestedId: id,
+        idLogged: tokenPayload.sub,
+      });
     }
   }
 
@@ -92,8 +101,15 @@ export class UserService {
         password: undefined,
       };
       return user;
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.create",
+        userDto: JSON.stringify({
+          ...userDto,
+          password: this.hashingService.hash(userDto.password),
+        }),
+        role: tokenPayload.role,
+      });
     }
   }
 
@@ -135,8 +151,15 @@ export class UserService {
         password: undefined,
       };
       return user;
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.update",
+        updateUserDto: JSON.stringify({
+          ...updateUserDto,
+          password: this.hashingService.hash(updateUserDto.password),
+        }),
+        role: tokenPayload.role,
+      });
     }
   }
 
@@ -163,8 +186,12 @@ export class UserService {
         success: true,
         statusCode: HttpStatus.OK,
       };
-    } catch (error: any) {
-      throw handleDatabaseError(error);
+    } catch (error: unknown) {
+      throw handleDatabaseError(error, {
+        operation: "UserService.remove",
+        requestedId: id,
+        role: tokenPayload.role,
+      });
     }
   }
 }
