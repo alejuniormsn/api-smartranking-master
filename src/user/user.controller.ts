@@ -52,6 +52,12 @@ export class UserController {
     return this.userService.findOne(id, tokenPayload);
   }
 
+  @Get(":id")
+  @Version("2")
+  async findOneV2(@Param("id", ParseIntPipe) id: number): Promise<IUser> {
+    return this.userService.findOneV2(id);
+  }
+
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,

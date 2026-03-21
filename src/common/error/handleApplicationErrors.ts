@@ -1,8 +1,8 @@
 import {
   BadRequestException,
+  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common/exceptions";
 import { Logger } from "@nestjs/common";
 
@@ -16,9 +16,9 @@ export interface CustomError {
   response?: any;
 }
 
-const logger = new Logger("DatabaseErrorHandler");
+const logger = new Logger("ApplicationErrorHandler");
 
-export const handleDatabaseError = (
+export const handleApplicationErrors = (
   error: unknown,
   metadata?: Record<string, any>
 ) => {
@@ -31,17 +31,19 @@ export const handleDatabaseError = (
 
   if (
     error instanceof NotFoundException ||
-    error instanceof UnauthorizedException
+    error instanceof ForbiddenException
   ) {
     return error;
   }
 
-  if (error === null || error === undefined) {
-    return new InternalServerErrorException("Internal Server Error");
-  }
-
-  if (typeof error === "object" && "status" in error && "message" in error) {
-    return new InternalServerErrorException(error as CustomError);
+  if (
+    error === null ||
+    error === undefined ||
+    (typeof error === "object" && "status" in error && "message" in error)
+  ) {
+    return new InternalServerErrorException(
+      (error as CustomError) ?? "Internal Server Error"
+    );
   }
 
   if (error instanceof Error) {

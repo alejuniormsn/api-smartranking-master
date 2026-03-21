@@ -6,7 +6,7 @@ import { IUser } from "src/user/interfaces/user.interface";
 import jwtConfig from "./config/jwt.config";
 import * as config from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
-import { handleDatabaseError } from "src/common/error/handleDatabaseError";
+import { handleApplicationErrors } from "src/common/error/handleApplicationErrors";
 
 @Injectable()
 export class AuthService {
@@ -60,7 +60,7 @@ export class AuthService {
 
       return { user, token };
     } catch (error: unknown) {
-      throw handleDatabaseError(error, {
+      throw handleApplicationErrors(error, {
         operation: "AuthService.authenticate",
         signInDto: JSON.stringify({
           email: signInDto.email,
