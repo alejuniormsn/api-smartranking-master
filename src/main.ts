@@ -1,6 +1,8 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ValidationPipe, VersioningType } from "@nestjs/common";
+import { Logger, ValidationPipe, VersioningType } from "@nestjs/common";
+
+const logger = new Logger("Main");
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,4 +22,8 @@ async function bootstrap() {
   );
   await app.listen(Number(process.env.PORT) || 3000);
 }
-void bootstrap();
+
+bootstrap().catch((err) => {
+  logger.error(err instanceof Error ? err.stack : "No stack trace");
+  process.exit(1);
+});
