@@ -24,6 +24,9 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  logger.error(err instanceof Error ? err.stack : "No stack trace");
+  logger.error(
+    "Error starting the application: ",
+    err instanceof Error ? err.stack : "No stack trace"
+  );
   process.exit(1);
 });
